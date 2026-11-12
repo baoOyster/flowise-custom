@@ -2,6 +2,7 @@ import express from 'express'
 import apikeyRouter from './apikey'
 import assistantsRouter from './assistants'
 import attachmentsRouter from './attachments'
+import canvasChatRouter from './canvas-chat'
 import chatMessageRouter from './chat-messages'
 import chatflowsRouter from './chatflows'
 import chatflowsStreamingRouter from './chatflows-streaming'
@@ -51,6 +52,7 @@ router.use('/assistants', assistantsRouter)
 router.use('/attachments', attachmentsRouter)
 router.use('/chatflows', chatflowsRouter)
 router.use('/chatflows-streaming', chatflowsStreamingRouter)
+router.use('/canvas-chat', canvasChatRouter)
 router.use('/chatmessage', chatMessageRouter)
 router.use('/components-credentials', componentsCredentialsRouter)
 router.use('/components-credentials-icon', componentsCredentialsIconRouter)

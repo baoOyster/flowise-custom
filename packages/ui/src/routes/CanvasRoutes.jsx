@@ -7,6 +7,7 @@ import MinimalLayout from '@/layout/MinimalLayout'
 // canvas routing
 const Canvas = Loadable(lazy(() => import('@/views/canvas')))
 const MarketplaceCanvas = Loadable(lazy(() => import('@/views/marketplaces/MarketplaceCanvas')))
+const CanvasChat = Loadable(lazy(() => import('@/views/canvaschat')))
 
 // ==============================|| CANVAS ROUTING ||============================== //
 
@@ -33,6 +34,14 @@ const CanvasRoutes = {
         {
             path: '/marketplace/:id',
             element: <MarketplaceCanvas />
+        },
+        {
+            path: '/canvas-chat',
+            element: <CanvasChat />
+        },
+        {
+            path: '/canvas-chat/:id',
+            element: <CanvasChat />
         }
     ]
 }

@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles'
 import { Avatar, Box, ButtonBase, Typography, Stack, TextField, Button } from '@mui/material'
 
 // icons
-import { IconSettings, IconChevronLeft, IconDeviceFloppy, IconPencil, IconCheck, IconX, IconCode } from '@tabler/icons-react'
+import { IconSettings, IconChevronLeft, IconDeviceFloppy, IconPencil, IconCheck, IconX, IconCode, IconSparkles } from '@tabler/icons-react'
 
 // project imports
 import Settings from '@/views/settings'
@@ -389,6 +389,30 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
                             </Avatar>
                         </ButtonBase>
                     )}
+                    <ButtonBase title='AI Flow Generator (Ollama)' sx={{ borderRadius: '50%', mr: 2 }}>
+                        <Avatar
+                            variant='rounded'
+                            sx={{
+                                ...theme.typography.commonAvatar,
+                                ...theme.typography.mediumAvatar,
+                                transition: 'all .2s ease-in-out',
+                                background: theme.palette.secondary.light,
+                                color: theme.palette.secondary.dark,
+                                '&:hover': {
+                                    background: theme.palette.secondary.dark,
+                                    color: theme.palette.secondary.light
+                                }
+                            }}
+                            color='inherit'
+                            onClick={() =>
+                                navigate(chatflow?.id ? `/canvas-chat/${chatflow.id}` : '/canvas-chat', {
+                                    state: { chatflow, isAgentCanvas }
+                                })
+                            }
+                        >
+                            <IconSparkles stroke={1.5} size='1.3rem' />
+                        </Avatar>
+                    </ButtonBase>
                     <ButtonBase title={`Save ${title}`} sx={{ borderRadius: '50%', mr: 2 }}>
                         <Avatar
                             variant='rounded'
@@ -430,6 +454,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
                     </ButtonBase>
                 </Box>
             </Stack>
+
             <Settings
                 chatflow={chatflow}
                 isSettingsOpen={isSettingsOpen}

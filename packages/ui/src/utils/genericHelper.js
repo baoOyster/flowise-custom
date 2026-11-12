@@ -482,31 +482,65 @@ export const getUpsertDetails = (nodes, edges) => {
             // Found Vector Store Node, proceed to find connected Document Loader node
             let connectedDocs = []
 
-            if (vsNode.data.inputs.document) connectedDocs = [...new Set(vsNode.data.inputs.document)]
+            if (vsNode.data.inputs?.document) {
+                if (typeof vsNode.data.inputs.document === 'string') {
+                    connectedDocs = [vsNode.data.inputs.document]
+                } else if (Array.isArray(vsNode.data.inputs.document)) {
+                    connectedDocs = [...new Set(vsNode.data.inputs.document)]
+                }
+            }
+
+            // Fallback: look for edges directly connected to vector store document input
+            if (!connectedDocs.length) {
+                const docEdges = edges.filter(
+                    (e) => e.target === vsNode.data.id && (e.targetHandle?.includes('document') || e.targetInput === 'document')
+                )
+                connectedDocs = docEdges.map((e) => `{{${e.source}.data.instance}}`)
+            }
 
             if (connectedDocs.length) {
                 const innerNodes = [vsNode]
 
-                if (vsNode.data.inputs.embeddings) {
-                    const embeddingsId = vsNode.data.inputs.embeddings.replace(/{{|}}/g, '').split('.')[0]
-                    innerNodes.push(nodes.find((node) => node.data.id === embeddingsId))
+                let embeddingsId = ''
+                if (vsNode.data.inputs?.embeddings) {
+                    embeddingsId = vsNode.data.inputs.embeddings.replace(/{{|}}/g, '').split('.')[0]
+                } else {
+                    const embEdge = edges.find(
+                        (e) => e.target === vsNode.data.id && (e.targetHandle?.includes('embeddings') || e.targetInput === 'embeddings')
+                    )
+                    if (embEdge) embeddingsId = embEdge.source
+                }
+                if (embeddingsId) {
+                    const embNode = nodes.find((node) => node.data.id === embeddingsId)
+                    if (embNode && !innerNodes.includes(embNode)) innerNodes.push(embNode)
                 }
 
-                if (vsNode.data.inputs.recordManager) {
+                if (vsNode.data.inputs?.recordManager) {
                     const recordManagerId = vsNode.data.inputs.recordManager.replace(/{{|}}/g, '').split('.')[0]
-                    innerNodes.push(nodes.find((node) => node.data.id === recordManagerId))
+                    const rmNode = nodes.find((node) => node.data.id === recordManagerId)
+                    if (rmNode && !innerNodes.includes(rmNode)) innerNodes.push(rmNode)
                 }
 
                 for (const doc of connectedDocs) {
                     const docId = doc.replace(/{{|}}/g, '').split('.')[0]
                     const docNode = nodes.find((node) => node.data.id === docId)
-                    if (docNode) innerNodes.push(docNode)
+                    if (docNode && !innerNodes.includes(docNode)) innerNodes.push(docNode)
 
                     // Found Document Loader Node, proceed to find connected Text Splitter node
-                    if (docNode && docNode.data.inputs.textSplitter) {
-                        const textSplitterId = docNode.data.inputs.textSplitter.replace(/{{|}}/g, '').split('.')[0]
+                    let textSplitterId = ''
+                    if (docNode && docNode.data.inputs?.textSplitter) {
+                        textSplitterId = docNode.data.inputs.textSplitter.replace(/{{|}}/g, '').split('.')[0]
+                    } else if (docNode) {
+                        const splitterEdge = edges.find(
+                            (e) =>
+                                e.target === docNode.data.id &&
+                                (e.targetHandle?.includes('textSplitter') || e.targetInput === 'textSplitter')
+                        )
+                        if (splitterEdge) textSplitterId = splitterEdge.source
+                    }
+                    if (textSplitterId) {
                         const textSplitterNode = nodes.find((node) => node.data.id === textSplitterId)
-                        if (textSplitterNode) innerNodes.push(textSplitterNode)
+                        if (textSplitterNode && !innerNodes.includes(textSplitterNode)) innerNodes.push(textSplitterNode)
                     }
                 }
 
