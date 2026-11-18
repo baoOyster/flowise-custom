@@ -2,14 +2,12 @@ import { StatusCodes } from 'http-status-codes'
 import { IChatProvider, IChatProviderMetadata, ChatProviderId } from './types'
 import { OllamaProvider } from './ollamaProvider'
 import { OpenAIProvider } from './openAIProvider'
-import { AnthropicProvider } from './anthropicProvider'
 import { GroqProvider } from './groqProvider'
 import { InternalFlowiseError } from '../../../errors/internalFlowiseError'
 
 const providerInstances: Record<ChatProviderId, IChatProvider> = {
     ollama: new OllamaProvider(),
     openai: new OpenAIProvider(),
-    anthropic: new AnthropicProvider(),
     groq: new GroqProvider()
 }
 

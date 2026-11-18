@@ -135,13 +135,6 @@ const DEFAULT_PROVIDERS = [
         defaultModels: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'o1-mini', 'o3-mini']
     },
     {
-        id: 'anthropic',
-        name: 'Anthropic',
-        type: 'cloud',
-        credentialName: 'anthropicApi',
-        defaultModels: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229']
-    },
-    {
         id: 'groq',
         name: 'Groq',
         type: 'cloud',
@@ -671,7 +664,7 @@ const CanvasChat = () => {
                             />
                         </Stack>
                         <Typography variant='caption' sx={{ color: colors.secondaryText, mt: 0.25, display: 'block' }}>
-                            Generate and wire Flowise chatflows with AI (Ollama, OpenAI, Anthropic, Groq)
+                            Generate and wire Flowise chatflows with AI (Ollama, OpenAI, Groq)
                         </Typography>
                     </Box>
                 </Stack>

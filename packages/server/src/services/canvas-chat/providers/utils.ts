@@ -1,5 +1,4 @@
 import { StatusCodes } from 'http-status-codes'
-import { SystemMessage, HumanMessage, AIMessage, BaseMessage } from '@langchain/core/messages'
 import { InternalFlowiseError } from '../../../errors/internalFlowiseError'
 
 export const getCredentialApiKey = async (credentialId: string, keyName: string, providerName: string): Promise<string> => {
@@ -29,13 +28,4 @@ export const getCredentialApiKey = async (credentialId: string, keyName: string,
     }
 
     return apiKey
-}
-
-export const toLangChainMessages = (messages: Array<{ role: string; content: string }>): BaseMessage[] => {
-    return (messages || []).map((m) => {
-        const role = (m.role || '').toLowerCase()
-        if (role === 'system') return new SystemMessage(m.content || '')
-        if (role === 'assistant' || role === 'ai') return new AIMessage(m.content || '')
-        return new HumanMessage(m.content || '')
-    })
 }

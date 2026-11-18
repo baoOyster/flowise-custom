@@ -23,7 +23,8 @@ export class OllamaProvider implements IChatProvider {
             const models = response.data?.models || []
             const names = models.map((m) => m.name).filter(Boolean)
             return names.length > 0 ? names : this.defaultModels
-        } catch {
+        } catch (error) {
+            console.log(`Error fetching models from Ollama at ${url}: ${getErrorMessage(error)}`)
             return this.defaultModels
         }
     }

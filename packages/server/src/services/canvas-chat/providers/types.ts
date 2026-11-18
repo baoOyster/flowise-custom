@@ -1,6 +1,6 @@
-export type ChatProviderId = 'ollama' | 'openai' | 'anthropic' | 'groq'
+export type ChatProviderId = 'ollama' | 'openai' | 'groq'
 export type ChatProviderType = 'local' | 'cloud'
-export type ChatCredentialName = 'openAIApi' | 'anthropicApi' | 'groqApi'
+export type ChatCredentialName = 'openAIApi' | 'groqApi'
 
 export interface IChatProvider {
     id: ChatProviderId

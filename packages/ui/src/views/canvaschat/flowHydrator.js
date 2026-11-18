@@ -72,8 +72,7 @@ const autoHealFlow = (rawFlow, componentNodes = []) => {
             category === 'document loaders' || ['pdf', 'file', 'loader', 'scraper', 'cheerio', 'textfile'].some((d) => name.includes(d))
         const isTextSplitter = category === 'text splitters' || name.includes('splitter')
         const isEmbeddings = category === 'embeddings' || name.includes('embedding')
-        const isChatModel =
-            category === 'chat models' || ['chatollama', 'chatopenai', 'chatanthropic', 'chatgroq'].some((m) => name.includes(m))
+        const isChatModel = category === 'chat models' || ['chatollama', 'chatopenai', 'chatgroq'].some((m) => name.includes(m))
         const isMemory = category === 'memory' || name.includes('memory')
         const isChain = category === 'chains' || name.includes('chain')
 

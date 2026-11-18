@@ -1,7 +1,7 @@
-import { ChatOpenAI } from '@langchain/openai'
+import axios from 'axios'
 import { StatusCodes } from 'http-status-codes'
 import { IChatProvider } from './types'
-import { getCredentialApiKey, toLangChainMessages } from './utils'
+import { getCredentialApiKey } from './utils'
 import { InternalFlowiseError } from '../../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../../errors/utils'
 
@@ -11,9 +11,29 @@ export class OpenAIProvider implements IChatProvider {
     readonly type = 'cloud' as const
     readonly credentialName = 'openAIApi' as const
     readonly defaultModels = ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'o1-mini', 'o3-mini']
+    readonly url = 'https://api.openai.com/v1'
 
     async getModels(_config: { url?: string; credentialId?: string }): Promise<string[]> {
-        return this.defaultModels
+        const config = _config
+        if (!config.credentialId) {
+            throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'OpenAI credential required but not selected')
+        }
+
+        const url = `${this.url}/models`
+
+        try {
+            const openAIApiKey = await getCredentialApiKey(config.credentialId, 'openAIApiKey', 'OpenAI')
+            const response = await axios.get<{ data?: Array<{ id: string }> }>(url, {
+                timeout: 5000,
+                headers: { Authorization: `Bearer ${openAIApiKey}` }
+            })
+            const models = response.data?.data || []
+            const names = models.map((m) => m.id).filter(Boolean)
+            return names.length > 0 ? names : this.defaultModels
+        } catch (error) {
+            console.log(`Error fetching models from OpenAI: ${getErrorMessage(error)}`)
+            return this.defaultModels
+        }
     }
 
     async invoke(
@@ -24,22 +44,22 @@ export class OpenAIProvider implements IChatProvider {
             throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'OpenAI credential required but not selected')
         }
 
+        const url = `${this.url}/chat/completions`
+
         try {
             const openAIApiKey = await getCredentialApiKey(config.credentialId, 'openAIApiKey', 'OpenAI')
-            const model = new ChatOpenAI({
-                openAIApiKey,
-                modelName: config.model || this.defaultModels[0],
-                temperature: 0.7
-            })
-
-            const langchainMessages = toLangChainMessages(messages)
-            const response = await model.invoke(langchainMessages)
-            return (typeof response.content === 'string' ? response.content : JSON.stringify(response.content)) || ''
+            const response = await axios.post<{ choices?: Array<{ message: { content: string } }> }>(
+                url,
+                {
+                    model: config.model || this.defaultModels[0],
+                    messages,
+                    stream: false
+                },
+                { timeout: 210000, headers: { Authorization: `Bearer ${openAIApiKey}` } }
+            )
+            return response.data?.choices?.[0]?.message?.content || ''
         } catch (error) {
-            if (error instanceof InternalFlowiseError) {
-                throw error
-            }
-            throw new InternalFlowiseError(StatusCodes.INTERNAL_SERVER_ERROR, `OpenAI invocation failed: ${getErrorMessage(error)}`)
+            throw new InternalFlowiseError(StatusCodes.SERVICE_UNAVAILABLE, `OpenAI invocation failed: ${getErrorMessage(error)}`)
         }
     }
 }
